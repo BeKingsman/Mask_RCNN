@@ -1829,6 +1829,11 @@ class MaskRCNN():
         config: A Sub-class of the Config class
         model_dir: Directory to save training logs and trained weights
         """
+	print("Harsh\n\n\n\n")
+	l_f= open("/content/Mask_RCNN/log_file.txt","w")
+	l_f.write("Init Called")
+	l_f.close() 
+	      
         assert mode in ['training', 'inference']
         self.mode = mode
         self.config = config
