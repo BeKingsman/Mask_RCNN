@@ -53,6 +53,40 @@ def log(text, array=None):
         text += "  {}".format(array.dtype)
     print(text)
 
+def get_ax(rows=1, cols=1, size=16):
+    """Return a Matplotlib Axes array to be used in
+    all visualizations in the notebook. Provide a
+    central point to control graph sizes.
+    
+    Adjust the size attribute to control how big to render images
+    """
+    _, ax = plt.subplots(rows, cols, figsize=(size*cols, size*rows))
+    return ax
+
+def custom_filtering(img,proposals):
+  ans=[]
+  for i in range(proposals.shape[0]):
+    # print(proposals[i])
+    ly=proposals[i][0]
+    lx=proposals[i][1]
+    uy=proposals[i][2]
+    ux=proposals[i][3]
+    bp=0
+    wp=0
+    th=0.1
+    black=60
+    for j in range(int(lx),int(ux)):
+      for k in range(int(ly),int(uy)):
+        if(img[j][k][0]<black):
+          bp+=1
+        else:
+          wp+=1
+    # print(bp)
+    if(wp==0):
+      continue
+    if(bp/wp>th):
+      ans.append(proposals[i])
+  return np.array(ans)
 
 class BatchNorm(KL.BatchNormalization):
     """Extends the Keras BatchNormalization class to allow a central place
@@ -181,7 +215,7 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     print("Resnet Graph\n\n")
     tf.print(input_image)
     log((input_image))
-    
+
     assert architecture in ["resnet50", "resnet101"]
     # Stage 1
     x = KL.ZeroPadding2D((3, 3))(input_image)
@@ -1975,7 +2009,9 @@ class MaskRCNN():
             nms_threshold=config.RPN_NMS_THRESHOLD,
             name="ROI",
             config=config)([rpn_class, rpn_bbox, anchors])
-
+        print(rpn_rois)
+        rpn_rois=custom_filtering(input_image,proposals)
+        print(rpn_rois)
         # custom_log(rpn_rois)
         if mode == "training":
             # Class ID mask to mark class IDs supported by the dataset the image
