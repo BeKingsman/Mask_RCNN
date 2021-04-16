@@ -324,6 +324,7 @@ class ProposalLayer(KE.Layer):
                                   self.config.IMAGES_PER_GPU,
                                   names=["refined_anchors_clipped"])
 
+        custom_log(str(boxes))
         # Filter out small boxes
         # According to Xinlei Chen's paper, this reduces detection accuracy
         # for small objects, so we're skipping it.
@@ -340,7 +341,7 @@ class ProposalLayer(KE.Layer):
             return proposals
         proposals = utils.batch_slice([boxes, scores], nms,
                                       self.config.IMAGES_PER_GPU)
-        custom_log(str(proposals))
+        
         return proposals
 
     def compute_output_shape(self, input_shape):
