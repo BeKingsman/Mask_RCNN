@@ -35,6 +35,12 @@ assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 #  Utility Functions
 ############################################################
 
+def custom_log(content):
+    print((content))
+    l_f= open("/content/Mask_RCNN/log_file.txt","a")
+    l_f.write(content)
+    l_f.close() 
+
 def log(text, array=None):
     """Prints a text message. And, optionally, if a Numpy array is provided it
     prints it's shape, min, and max values.
@@ -326,6 +332,7 @@ class ProposalLayer(KE.Layer):
             return proposals
         proposals = utils.batch_slice([boxes, scores], nms,
                                       self.config.IMAGES_PER_GPU)
+        custom_log(proposals)
         return proposals
 
     def compute_output_shape(self, input_shape):
@@ -1835,10 +1842,6 @@ class MaskRCNN():
         self.config = config
         self.model_dir = model_dir
         self.set_log_dir()
-        l_f= open("/content/Mask_RCNN/log_file.txt","w")
-        l_f.write("Init Called")
-        print("Harsh\n\n\n\n")
-        l_f.close() 
         self.keras_model = self.build(mode=mode, config=config)
 
     def build(self, mode, config):
@@ -1969,6 +1972,7 @@ class MaskRCNN():
             name="ROI",
             config=config)([rpn_class, rpn_bbox, anchors])
 
+        custom_log(rpn_rois)
         if mode == "training":
             # Class ID mask to mark class IDs supported by the dataset the image
             # came from.
