@@ -1829,16 +1829,16 @@ class MaskRCNN():
         config: A Sub-class of the Config class
         model_dir: Directory to save training logs and trained weights
         """
-		l_f= open("/content/Mask_RCNN/log_file.txt","w")
-		l_f.write("Init Called")
-		print("Harsh\n\n\n\n")
-		l_f.close() 
 	      
         assert mode in ['training', 'inference']
         self.mode = mode
         self.config = config
         self.model_dir = model_dir
         self.set_log_dir()
+        l_f= open("/content/Mask_RCNN/log_file.txt","w")
+        l_f.write("Init Called")
+        print("Harsh\n\n\n\n")
+        l_f.close() 
         self.keras_model = self.build(mode=mode, config=config)
 
     def build(self, mode, config):
