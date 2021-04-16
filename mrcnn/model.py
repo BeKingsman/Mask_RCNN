@@ -178,6 +178,10 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
         stage5: Boolean. If False, stage5 of the network is not created
         train_bn: Boolean. Train or freeze Batch Norm layers
     """
+    print("Resnet Graph\n\n")
+    tf.print(input_image)
+    log((input_image))
+    
     assert architecture in ["resnet50", "resnet101"]
     # Stage 1
     x = KL.ZeroPadding2D((3, 3))(input_image)
