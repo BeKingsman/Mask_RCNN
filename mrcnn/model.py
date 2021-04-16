@@ -332,7 +332,7 @@ class ProposalLayer(KE.Layer):
             return proposals
         proposals = utils.batch_slice([boxes, scores], nms,
                                       self.config.IMAGES_PER_GPU)
-        custom_log(proposals)
+        custom_log(str(proposals))
         return proposals
 
     def compute_output_shape(self, input_shape):
@@ -1972,7 +1972,7 @@ class MaskRCNN():
             name="ROI",
             config=config)([rpn_class, rpn_bbox, anchors])
 
-        custom_log(rpn_rois)
+        # custom_log(rpn_rois)
         if mode == "training":
             # Class ID mask to mark class IDs supported by the dataset the image
             # came from.
