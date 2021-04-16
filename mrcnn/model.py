@@ -314,7 +314,7 @@ class ProposalLayer(KE.Layer):
                                   self.config.IMAGES_PER_GPU,
                                   names=["refined_anchors_clipped"])
 
-        log((boxes.data))
+        tf.print(boxes)
         log((boxes))
         # Filter out small boxes
         # According to Xinlei Chen's paper, this reduces detection accuracy
