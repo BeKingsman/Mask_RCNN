@@ -36,6 +36,7 @@ assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 ############################################################
 
 def custom_log(content):
+    content=str(content)
     print((content))
     l_f= open("/content/Mask_RCNN/log_file.txt","a")
     l_f.write(content)
