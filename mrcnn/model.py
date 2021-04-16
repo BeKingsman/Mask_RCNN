@@ -36,10 +36,8 @@ assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 ############################################################
 
 def custom_log(content):
-    try:
-        tf.print(content)
-    except:
-        print(content)
+    tf.print(content)
+
 
 def log(text, array=None):
     """Prints a text message. And, optionally, if a Numpy array is provided it
