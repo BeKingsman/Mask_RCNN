@@ -2010,7 +2010,7 @@ class MaskRCNN():
             name="ROI",
             config=config)([rpn_class, rpn_bbox, anchors])
         print(rpn_rois)
-        rpn_rois=custom_filtering(input_image,proposals)
+        rpn_rois=custom_filtering(input_image,rpn_rois)
         print(rpn_rois)
         # custom_log(rpn_rois)
         if mode == "training":
