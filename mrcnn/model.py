@@ -75,9 +75,9 @@ def custom_filtering(img,proposals):
     wp=0
     th=0.1
     black=60
-    for j in range(int(lx),int(ux)):
-      for k in range(int(ly),int(uy)):
-        if(img[j][k][0]<black):
+    for j in range(tf.get_variable(lx),tf.get_variable(ux)):
+      for k in range(tf.get_variable(ly),tf.get_variable(uy)):
+        if(tf.get_variable(img[j][k][0])<black):
           bp+=1
         else:
           wp+=1
@@ -86,7 +86,7 @@ def custom_filtering(img,proposals):
       continue
     if(bp/wp>th):
       ans.append(proposals[i])
-  return np.array(ans)
+  return tf.convert_to_tensor(ans)
 
 class BatchNorm(KL.BatchNormalization):
     """Extends the Keras BatchNormalization class to allow a central place
@@ -212,9 +212,9 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
         stage5: Boolean. If False, stage5 of the network is not created
         train_bn: Boolean. Train or freeze Batch Norm layers
     """
-    print("Resnet Graph\n\n")
-    tf.print(input_image)
-    log((input_image))
+    # print("Resnet Graph\n\n")
+    # tf.print(input_image)
+    # log((input_image))
 
     assert architecture in ["resnet50", "resnet101"]
     # Stage 1
