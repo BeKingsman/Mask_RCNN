@@ -65,28 +65,34 @@ def get_ax(rows=1, cols=1, size=16):
 
 def custom_filtering(img,proposals):
   ans=[]
-  for i in range(proposals.shape[0]):
-    # print(proposals[i])
-    ly=proposals[i][0]
-    lx=proposals[i][1]
-    uy=proposals[i][2]
-    ux=proposals[i][3]
-    bp=0
-    wp=0
-    th=0.1
-    black=60
-    for j in range(tf.get_variable(lx),tf.get_variable(ux)):
-      for k in range(tf.get_variable(ly),tf.get_variable(uy)):
-        if(tf.get_variable(img[j][k][0])<black):
-          bp+=1
-        else:
-          wp+=1
-    # print(bp)
-    if(wp==0):
-      continue
-    if(bp/wp>th):
-      ans.append(proposals[i])
-  return tf.convert_to_tensor(ans)
+  print("\nPrinting Img:\n")
+  print(img)
+  print("\n\nPrinting Proposals:\n")
+  print(proposals)
+  return proposals
+#   for i in range(proposals.shape[0]):
+#     # print(proposals[i])
+#     ly=proposals[i][0]
+#     lx=proposals[i][1]
+#     uy=proposals[i][2]
+#     ux=proposals[i][3]
+#     bp=0
+#     wp=0
+#     th=0.1
+#     black=60
+#     for j in range(tf.get_variable(lx),tf.get_variable(ux)):
+#       for k in range(tf.get_variable(ly),tf.get_variable(uy)):
+#         if(tf.get_variable(img[j][k][0])<black):
+#           bp+=1
+#         else:
+#           wp+=1
+#     # print(bp)
+#     if(wp==0):
+#       continue
+#     if(bp/wp>th):
+#       ans.append(proposals[i])
+#   return tf.convert_to_tensor(ans)
+
 
 class BatchNorm(KL.BatchNormalization):
     """Extends the Keras BatchNormalization class to allow a central place
