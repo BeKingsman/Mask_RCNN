@@ -69,7 +69,7 @@ def custom_filtering(img,proposals):
   print(img)
   print("\n\nPrinting Proposals:\n")
   print(proposals)
-  return proposals
+  return proposals[:10]
 #   for i in range(proposals.shape[0]):
 #     # print(proposals[i])
 #     ly=proposals[i][0]
