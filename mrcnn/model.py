@@ -67,9 +67,14 @@ def custom_filtering(img,proposals):
   ans=[]
   print("\nPrinting Img:\n")
   print(img)
+#   print(img.shape)
   print("\n\nPrinting Proposals:\n")
   print(proposals)
-  return proposals[:10]
+  for i in tf.range(proposals.shape[0]):
+      print(proposals[i])
+#   print(proposals.shape)
+
+  return proposals
 #   for i in range(proposals.shape[0]):
 #     # print(proposals[i])
 #     ly=proposals[i][0]
@@ -2015,9 +2020,9 @@ class MaskRCNN():
             nms_threshold=config.RPN_NMS_THRESHOLD,
             name="ROI",
             config=config)([rpn_class, rpn_bbox, anchors])
-        # print(rpn_rois)
-        # rpn_rois=custom_filtering(input_image,rpn_rois)
-        # print(rpn_rois)
+        print(rpn_rois)
+        rpn_rois=custom_filtering(input_image,rpn_rois)
+        print(rpn_rois)
         # custom_log(rpn_rois)
         if mode == "training":
             # Class ID mask to mark class IDs supported by the dataset the image
