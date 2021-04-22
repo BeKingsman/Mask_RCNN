@@ -390,6 +390,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         new_class_ids=[]
         
         for rno in range(len(r["rois"])):
+            r["rois"][rno]=r["rois"][rno].astype('int32')
             enl=find_enl(image,r["rois"][rno][0],r["rois"][rno][1],r["rois"][rno][2],r["rois"][rno][3])
             if(enl>enl_threshold):
                 r["masks"][r["rois"][rno][1]:r["rois"][rno][1]+r["rois"][rno][3],r["rois"][rno][0]:r["rois"][rno][0]+r["rois"][rno][2]]=False
@@ -398,9 +399,9 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
                 new_scores.append(r["scores"][rno])
                 new_class_ids.append(1)
 
-        r["rois"]=new_rois
-        r["scores"]=new_scores
-        r["class_ids"]=new_class_ids
+        r["rois"]=np.array(new_rois)
+        r["scores"]=np.array(new_scores)
+        r["class_ids"]=np.array(new_class_ids)
 
         print("Length of rois: "+str(len(r["rois"])))
         print("Length of mask: "+str(len(r["masks"])))
