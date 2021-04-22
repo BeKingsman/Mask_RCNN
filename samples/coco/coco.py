@@ -368,6 +368,17 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         r = model.detect([image], verbose=0)[0]
         t_prediction += (time.time() - t)
 
+        print("Length of rois: "+str(len(r["rois"])))
+        print("Length of mask: "+str(r["masks"])))
+        print("Length of scores: "+str(len(r["scores"])))
+        print("Length of class ids: "+str(len(r["class_ids"])))
+
+        print(r["rois"],end="\n\n")
+        print(r["masks"],end="\n\n")
+        print(r["scores"],end="\n\n")
+        print(r["class_ids"],end="\n\n")
+
+
         # Convert results to COCO format
         # Cast masks to uint8 because COCO tools errors out on bool
         image_results = build_coco_results(dataset, coco_image_ids[i:i + 1],
