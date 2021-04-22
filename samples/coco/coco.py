@@ -338,8 +338,14 @@ def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
             results.append(result)
     return results
 
+def find_enl(image,x,y,w,h):
+    temp_image=image[y:y+h,x:x+w]
+    mean=np.mean(temp_image)
+    std = np.std(temp_image)
+    enl=((mean*mean)/std)/std
+    return enl
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=2):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
@@ -372,12 +378,35 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         print("Length of mask: "+str(len(r["masks"])))
         print("Length of scores: "+str(len(r["scores"])))
         print("Length of class ids: "+str(len(r["class_ids"])))
+        print("\n")
 
-        print(r["rois"],end="\n\n")
-        print(r["masks"],end="\n\n")
-        print(r["scores"],end="\n\n")
-        print(r["class_ids"],end="\n\n")
+        # print(r["rois"],end="\n\n")
+        # print(r["masks"],end="\n\n")
+        # print(r["scores"],end="\n\n")
+        # print(r["class_ids"],end="\n\n")
 
+        new_rois=[]
+        new_scores=[]
+        new_class_ids=[]
+        
+        for rno in range(len(r["rois"])):
+            enl=find_enl(image,r["rois"][rno][0],r["rois"][rno][1],r["rois"][rno][2],r["rois"][rno][3])
+            if(enl>enl_threshold):
+                r["masks"][r["rois"][rno][1]:r["rois"][rno][1]+r["rois"][rno][3],r["rois"][rno][0]:r["rois"][rno][0]+r["rois"][rno][2]]=False
+            else:
+                new_rois.append(r["rois"][rno])
+                new_scores.append(r["scores"][rno])
+                new_class_ids.append(1)
+
+        r["rois"]=new_rois
+        r["scores"]=new_scores
+        r["class_ids"]=new_class_ids
+
+        print("Length of rois: "+str(len(r["rois"])))
+        print("Length of mask: "+str(len(r["masks"])))
+        print("Length of scores: "+str(len(r["scores"])))
+        print("Length of class ids: "+str(len(r["class_ids"])))
+        print("#########################\n\n")
 
         # Convert results to COCO format
         # Cast masks to uint8 because COCO tools errors out on bool
