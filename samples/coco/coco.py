@@ -345,7 +345,7 @@ def find_enl(image,x,y,w,h):
     enl=((mean*mean)/std)/std
     return enl
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=2):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
