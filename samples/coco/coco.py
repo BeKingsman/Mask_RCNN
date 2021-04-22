@@ -369,7 +369,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         t_prediction += (time.time() - t)
 
         print("Length of rois: "+str(len(r["rois"])))
-        print("Length of mask: "+str(r["masks"])))
+        print("Length of mask: "+str(len(r["masks"])))
         print("Length of scores: "+str(len(r["scores"])))
         print("Length of class ids: "+str(len(r["class_ids"])))
 
