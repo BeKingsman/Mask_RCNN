@@ -357,7 +357,8 @@ def Masked_standard_deviation(image,mask):
     image=image[:,:,:1]
 
     temp=image.flatten()[mask.flatten()==True]
-    std=np.std(temp)
+    temp2 = temp[np.logical_not(np.isnan(temp))]
+    std=np.std(temp2)
     metric=((256*256)/std)/std
     return metric
 
@@ -446,6 +447,8 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
 
     print("\n\n")
     masked_metric_log = np.asarray(masked_metric_log, dtype=np.float32)
+    print("Masked Metric is: ",end=" ")
+    print(masked_metric_log)
     print("Minimum of Masked metric is: "+str(np.min(masked_metric_log)))
     print("Average of Masked metric is: "+str(np.mean(masked_metric_log)))
     print("Maximum of Masked metric is: "+str(np.max(masked_metric_log)),end="\n")
