@@ -381,6 +381,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     t_start = time.time()
 
     results = []
+    masked_metric_log=[]
     for i, image_id in enumerate(image_ids):
         # Load image
         image = dataset.load_image(image_id)
@@ -407,6 +408,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             h=min(800-y,h+int(2*extend_per*h))
 
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
+            masked_metric_log.append(masked_metric)
             if masked_metric<masked_threshold:
                 r["masks"][y:y+h,x:x+w]=False
                 print("Removing Bounding Box with Masked Metric value: "+str(masked_metric))
@@ -419,8 +421,6 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         r["rois"]=np.array(new_rois)
         r["scores"]=np.array(new_scores)
         r["class_ids"]=np.array(new_class_ids)
-
-        print(str(removed_bbox)+" Bounding Boxes Removed By Custom Filter")
 
         # Convert results to COCO format
         # Cast masks to uint8 because COCO tools errors out on bool
@@ -443,6 +443,14 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     print("Prediction time: {}. Average {}/image".format(
         t_prediction, t_prediction / len(image_ids)))
     print("Total time: ", time.time() - t_start)
+
+    print("\n\n")
+    masked_metric_log = np.asarray(masked_metric_log, dtype=np.float32)
+    print("Minimum of Masked metric is: "+str(np.min(masked_metric_log)))
+    print("Average of Masked metric is: "+str(np.mean(masked_metric_log)))
+    print("Maximum of Masked metric is: "+str(np.max(masked_metric_log)),end="\n")
+
+    print(str(removed_bbox)+" Bounding Boxes Removed By Custom Filter")
 
 
 ############################################################
