@@ -345,7 +345,23 @@ def find_enl(image,x,y,w,h):
     enl=((mean*mean)/std)/std
     return enl
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100):
+def find_per(image,x,y,w,h,bt=5,bm=20):
+  nb=np.count_nonzero(image[y:y+h,x:x+w]<bm)
+  nw=np.count_nonzero(image[y:y+h,x:x+w]>=bm)
+  if(nw==0):
+    return 0
+  return (nb/(nw+nb))*100
+
+def Masked_standard_deviation(image,mask):
+    print(image[0],end="\n\n")
+    print(image[0][0],end="\n\n")
+    print(mask[0],end="\n\n")
+    print(mask[0][0],end="\n\n")
+    
+
+    return 0.1
+
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=1,unmasked_threshold=1):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
@@ -374,26 +390,25 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         r = model.detect([image], verbose=0)[0]
         t_prediction += (time.time() - t)
 
-        print("Length of rois: "+str(len(r["rois"])))
-        print("Length of mask: "+str(len(r["masks"])))
-        print("Length of scores: "+str(len(r["scores"])))
-        print("Length of class ids: "+str(len(r["class_ids"])))
-        print("\n")
-
-        # print(r["rois"],end="\n\n")
-        # print(r["masks"],end="\n\n")
-        # print(r["scores"],end="\n\n")
-        # print(r["class_ids"],end="\n\n")
-
         new_rois=[]
         new_scores=[]
         new_class_ids=[]
+        removed_bbox=0
+
+        # img_mean=np.mean(image)
         
         for rno in range(len(r["rois"])):
             r["rois"][rno]=r["rois"][rno].astype('int32')
-            enl=find_enl(image,r["rois"][rno][0],r["rois"][rno][1],r["rois"][rno][2],r["rois"][rno][3])
-            if(enl>enl_threshold):
-                r["masks"][r["rois"][rno][1]:r["rois"][rno][1]+r["rois"][rno][3],r["rois"][rno][0]:r["rois"][rno][0]+r["rois"][rno][2]]=False
+            x=max(0,int(r["rois"][rno][0])-int(extend_per*w))
+            y=max(0,int(r["rois"][rno][1])-int(extend_per*h))
+            w=min(800-x,int(r["rois"][rno][2])+int(2*extend_per*w))
+            h=min(800-y,int(r["rois"][rno][3])+int(2*extend_per*h))
+
+            masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
+
+            if masked_metric<masked_threshold:
+                r["masks"][y:y+h,x:x+w]=False
+                removed_bbox+=1   
             else:
                 new_rois.append(r["rois"][rno])
                 new_scores.append(r["scores"][rno])
@@ -403,11 +418,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         r["scores"]=np.array(new_scores)
         r["class_ids"]=np.array(new_class_ids)
 
-        print("Length of rois: "+str(len(r["rois"])))
-        print("Length of mask: "+str(len(r["masks"])))
-        print("Length of scores: "+str(len(r["scores"])))
-        print("Length of class ids: "+str(len(r["class_ids"])))
-        print("#########################\n\n")
+        print(str(removed_bbox)+" Bounding Boxes Removed By Custom Filter")
 
         # Convert results to COCO format
         # Cast masks to uint8 because COCO tools errors out on bool
