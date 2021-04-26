@@ -409,6 +409,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             h=min(800-y,h+int(2*extend_per*h))
 
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
+            print(masked_metric)
             masked_metric_log.append(masked_metric)
             if r["scores"][rno]<filter_score_threshold and masked_metric<masked_threshold:
                 r["masks"][y:y+h,x:x+w]=False
