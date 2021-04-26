@@ -353,7 +353,7 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
-    final_mask=np.zeros((800,800),dtype=np.int32)
+    final_mask=np.zeros(image.shape,dtype=np.int32)
     for i in range(mask.shape[2]):
         final_mask=final_mask + mask[:,:,i]
     temp=image[:,:,0][final_mask>0]
@@ -450,6 +450,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     masked_metric_log = np.asarray(masked_metric_log, dtype=np.float32)
     print("Masked Metric is: ",end=" ")
     print(masked_metric_log)
+    masked_metric_log = masked_metric_log[np.logical_not(np.isnan(masked_metric_log))]
     print("Minimum of Masked metric is: "+str(np.min(masked_metric_log)))
     print("Average of Masked metric is: "+str(np.mean(masked_metric_log)))
     print("Maximum of Masked metric is: "+str(np.max(masked_metric_log)),end="\n")
