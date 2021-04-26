@@ -357,7 +357,11 @@ def Masked_standard_deviation(image,mask):
     print(image[0][0],end="\n\n")
     print(mask[0],end="\n\n")
     print(mask[0][0],end="\n\n")
-    
+
+    print(image,end="\n\n")
+    print(mask,end="\n\n")
+    print("#####################\n\n\n")
+
 
     return 0.1
 
@@ -399,10 +403,12 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         
         for rno in range(len(r["rois"])):
             r["rois"][rno]=r["rois"][rno].astype('int32')
+            w=int(r["rois"][rno][2])
+            h=int(r["rois"][rno][3])
             x=max(0,int(r["rois"][rno][0])-int(extend_per*w))
             y=max(0,int(r["rois"][rno][1])-int(extend_per*h))
-            w=min(800-x,int(r["rois"][rno][2])+int(2*extend_per*w))
-            h=min(800-y,int(r["rois"][rno][3])+int(2*extend_per*h))
+            w=min(800-x,w+int(2*extend_per*w))
+            h=min(800-y,h+int(2*extend_per*h))
 
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
 
