@@ -353,16 +353,17 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
-    mask1=mask[:,:,:1]
-    mask2=mask[:,:,1:]
-    mask=mask1 & mask2
-    image=image[:,:,:1]
+    # mask1=mask[:,:,:1]
+    # mask2=mask[:,:,1:]
+    # mask=mask1 & mask2
+    # image=image[:,:,:1]
 
-    temp=image.flatten()[mask.flatten()]
-    temp2 = temp[np.logical_not(np.isnan(temp))]
-    std=np.std(temp2)
-    metric=((256*256)/std)/std
-    return metric
+    # temp=image.flatten()[mask.flatten()]
+    # temp2 = temp[np.logical_not(np.isnan(temp))]
+    # std=np.std(temp2)
+    # metric=((256*256)/std)/std
+    # return metric
+    return 1
 
 def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=0,unmasked_threshold=1,filter_score_threshold=1):
     """Runs official COCO evaluation.
