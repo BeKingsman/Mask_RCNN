@@ -353,17 +353,13 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
-    # mask1=mask[:,:,:1]
-    # mask2=mask[:,:,1:]
-    # mask=mask1 & mask2
-    # image=image[:,:,:1]
-
-    # temp=image.flatten()[mask.flatten()]
-    # temp2 = temp[np.logical_not(np.isnan(temp))]
-    # std=np.std(temp2)
-    # metric=((256*256)/std)/std
-    # return metric
-    return 1
+    final_mask=np.zeros((800,800),dtype=np.int32)
+    for i in range(mask.shape[2]):
+        final_mask=final_mask + mask[:,:,i]
+    temp=image[:,:,0][final_mask>0]
+    std=np.std(temp)
+    metric=((256*256)/std)/std
+    return metric
 
 def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=0,unmasked_threshold=1,filter_score_threshold=1):
     """Runs official COCO evaluation.
@@ -411,12 +407,12 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             w=min(800-x,w+int(2*extend_per*w))
             h=min(800-y,h+int(2*extend_per*h))
 
-            print(r["masks"].shape)
+
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
-            print(masked_metric,end="\n\n")
+            print(masked_metric)
             masked_metric_log.append(masked_metric)
             if r["scores"][rno]<filter_score_threshold and masked_metric<masked_threshold:
-                r["masks"][y:y+h,x:x+w]=False
+                # r["masks"][y:y+h,x:x+w]=False
                 print("Removing Bounding Box with Masked Metric value: "+str(masked_metric))
                 removed_bbox+=1   
             else:
