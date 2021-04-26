@@ -353,7 +353,7 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
-    final_mask=np.zeros(image.shape,dtype=np.int32)
+    final_mask=np.zeros((image.shape[0],image.shape[1]),dtype=np.int32)
     for i in range(mask.shape[2]):
         final_mask=final_mask + mask[:,:,i]
     temp=image[:,:,0][final_mask>0]
