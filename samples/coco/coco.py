@@ -353,7 +353,12 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
-    temp=image[mask==True]
+    print(image.shape)
+    print(mask.shape)
+    print(image)
+    print(mask)
+
+    temp=image.flatten()[mask.flatten()==True]
     std=np.std(temp)
     metric=((256*256)/std)/std
     return metric
