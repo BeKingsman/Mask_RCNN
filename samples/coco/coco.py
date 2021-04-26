@@ -353,17 +353,12 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
+    temp=image[mask==True]
+    std=np.std(temp)
+    metric=((256*256)/std)/std
+    return metric
 
-    temp_img=image and mask
-    print(temp_img,end="\n")
-
-    temp_img=temp_img.flatten()
-    print(temp_img,end="\n")
-    std=np.std(temp_img[temp_img!=0])
-    print(std,end="\n\n#########################################\n")
-    return 0.1
-
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=1,unmasked_threshold=1):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=0,unmasked_threshold=1):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
@@ -411,6 +406,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
             if masked_metric<masked_threshold:
                 r["masks"][y:y+h,x:x+w]=False
+                print("Removing Bounding Box with Masked Metric value: "+str(masked_metric))
                 removed_bbox+=1   
             else:
                 new_rois.append(r["rois"][rno])
