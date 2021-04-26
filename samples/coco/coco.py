@@ -361,7 +361,7 @@ def Masked_standard_deviation(image,mask):
     metric=((256*256)/std)/std
     return metric
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=0,unmasked_threshold=1):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=0,unmasked_threshold=1,filter_score_threshold=1):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
@@ -409,7 +409,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
 
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
             masked_metric_log.append(masked_metric)
-            if masked_metric<masked_threshold:
+            if r["scores"][rno]<filter_score_threshold and masked_metric<masked_threshold:
                 r["masks"][y:y+h,x:x+w]=False
                 print("Removing Bounding Box with Masked Metric value: "+str(masked_metric))
                 removed_bbox+=1   
