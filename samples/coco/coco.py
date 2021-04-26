@@ -353,10 +353,12 @@ def find_per(image,x,y,w,h,bt=5,bm=20):
   return (nb/(nw+nb))*100
 
 def Masked_standard_deviation(image,mask):
-    mask=mask[:,:,:1]
+    mask1=mask[:,:,:1]
+    mask2=mask[:,:,1:]
+    mask=mask1 & mask2
     image=image[:,:,:1]
 
-    temp=image.flatten()[mask.flatten()==True]
+    temp=image.flatten()[mask.flatten()]
     temp2 = temp[np.logical_not(np.isnan(temp))]
     std=np.std(temp2)
     metric=((256*256)/std)/std
@@ -408,8 +410,9 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             w=min(800-x,w+int(2*extend_per*w))
             h=min(800-y,h+int(2*extend_per*h))
 
+            print(r["masks"].shape)
             masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
-            print(masked_metric)
+            print(masked_metric,end="\n\n")
             masked_metric_log.append(masked_metric)
             if r["scores"][rno]<filter_score_threshold and masked_metric<masked_threshold:
                 r["masks"][y:y+h,x:x+w]=False
