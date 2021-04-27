@@ -361,7 +361,7 @@ def Masked_standard_deviation(image,mask):
     metric=((256*256)/std)/std
     return metric
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,enl_threshold=100,extend_per=0.2,masked_threshold=0,unmasked_threshold=1,filter_score_threshold=1):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,extend_per=0.2,filter_score_threshold=0.8):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
@@ -381,7 +381,6 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     t_start = time.time()
 
     results = []
-    masked_metric_log=[]
     for i, image_id in enumerate(image_ids):
         # Load image
         image = dataset.load_image(image_id)
@@ -408,12 +407,9 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             h=min(800-y,h+int(2*extend_per*h))
 
 
-            masked_metric=Masked_standard_deviation(image[y:y+h,x:x+w],r["masks"][y:y+h,x:x+w])
-            print(masked_metric)
-            masked_metric_log.append(masked_metric)
-            if r["scores"][rno]<filter_score_threshold and masked_metric<masked_threshold:
+            if r["scores"][rno]<filter_score_threshold:
                 # r["masks"][y:y+h,x:x+w]=False
-                print("Removing Bounding Box with Masked Metric value: "+str(masked_metric))
+                print("Removing Bounding Box")
                 removed_bbox+=1   
             else:
                 new_rois.append(r["rois"][rno])
@@ -445,15 +441,6 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     print("Prediction time: {}. Average {}/image".format(
         t_prediction, t_prediction / len(image_ids)))
     print("Total time: ", time.time() - t_start)
-
-    print("\n\n")
-    masked_metric_log = np.asarray(masked_metric_log, dtype=np.float32)
-    print("Masked Metric is: ",end=" ")
-    print(masked_metric_log)
-    masked_metric_log = masked_metric_log[np.logical_not(np.isnan(masked_metric_log))]
-    print("Minimum of Masked metric is: "+str(np.min(masked_metric_log)))
-    print("Average of Masked metric is: "+str(np.mean(masked_metric_log)))
-    print("Maximum of Masked metric is: "+str(np.max(masked_metric_log)),end="\n")
 
     print(str(removed_bbox)+" Bounding Boxes Removed By Custom Filter")
 
