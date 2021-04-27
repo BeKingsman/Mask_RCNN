@@ -393,6 +393,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
 
     results = []
     removed_bbox=0
+    metric_val_log=[]
     for i, image_id in enumerate(image_ids):
         # Load image
         image = dataset.load_image(image_id)
@@ -417,9 +418,12 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             w=min(800-x,w+int(2*extend_per*w))
             h=min(800-y,h+int(2*extend_per*h))
 
-            if r["scores"][rno]<filter_score_threshold and Quadtratic_metric(image[y:y+h,x:x+w,0],img_mean)<metric_threshold:
+            metric_val=Quadtratic_metric(image[y:y+h,x:x+w,0],img_mean)
+            metric_val_log.append(metric_val)
+            print(metric_val)
+            if r["scores"][rno]<filter_score_threshold and metric_val<metric_threshold:
                 # r["masks"][y:y+h,x:x+w]=False
-                print("Removing Bounding Box")
+                print("Bounding Box Removed")
                 removed_bbox+=1   
             else:
                 new_rois.append(r["rois"][rno])
@@ -452,6 +456,10 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         t_prediction, t_prediction / len(image_ids)))
     print("Total time: ", time.time() - t_start)
 
+    metric_val_log = np.asarray(metric_val_log, dtype=np.float32)
+    print("min value of metric is: "+str(np.min(metric_val_log)))
+    print("Avg value of metric is: "+str(np.mean(metric_val_log)))
+    print("max value of metric is: "+str(np.max(metric_val_log)))
     print(str(removed_bbox)+" Bounding Boxes Removed By Custom Filter")
 
 
