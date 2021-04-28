@@ -361,11 +361,9 @@ def Masked_standard_deviation(image,mask):
     metric=((256*256)/std)/std
     return metric
 
-def Quadtratic_metric(image,img_mean):
+def Quadtratic_metric(image,img_mean,mean_val=500):
     array1=image[image<=img_mean]
     array2=image[image>img_mean]
-
-    mean_val=((255-img_mean)/255)*1000
 
     array1=(np.square((array1/img_mean)-1)*(1000-mean_val))+mean_val
     array2=mean_val - (mean_val*(np.square(((array2-img_mean)/(255-img_mean)))))
@@ -374,7 +372,7 @@ def Quadtratic_metric(image,img_mean):
     return np.mean(final)
 
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,extend_per=0.2,filter_score_threshold=0.8,metric_threshold=0):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None,extend_per=0.2,filter_score_threshold=0.8,metric_threshold=0,mean_score_val=500):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
@@ -421,13 +419,13 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             w=min(800-x,w+int(2*extend_per*w))
             h=min(800-y,h+int(2*extend_per*h))
 
-            metric_val=Quadtratic_metric(image[y:y+h,x:x+w,0],img_mean)
+            metric_val=Quadtratic_metric(image[y:y+h,x:x+w,0],img_mean,mean_score_val)
             metric_val_log.append(metric_val)
-            print(metric_val)
             total_bbox+=1
             if r["scores"][rno]<filter_score_threshold and metric_val<metric_threshold:
-                # r["masks"][y:y+h,x:x+w]=False
-                print("Bounding Box Removed")
+                print(image_id)
+                print("x: "+str(x)+"  y: "+str(y)+"  w: "+str(w)+"  h: "+str(h))
+                print("Bounding Box Removed\n")
                 removed_bbox+=1   
             else:
                 new_rois.append(r["rois"][rno])
