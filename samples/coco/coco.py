@@ -408,7 +408,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         new_scores=[]
         new_class_ids=[]
 
-        img_mean=np.mean(image)
+        img_mean=np.mean(image[:,:,0])
         
         for rno in range(len(r["rois"])):
             r["rois"][rno]=r["rois"][rno].astype('int32')
@@ -422,6 +422,10 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
             metric_val=Quadtratic_metric(image[y:y+h,x:x+w,0],img_mean,mean_score_val)
             metric_val_log.append(metric_val)
             total_bbox+=1
+
+            # if metric_val<metric_threshold:
+            #     print("Score: "+str(r["scores"][rno])+"  metric value: "+str(metric_val)+"\n")
+                
             if r["scores"][rno]<filter_score_threshold and metric_val<metric_threshold:
                 print(image_id)
                 print("x: "+str(x)+"  y: "+str(y)+"  w: "+str(w)+"  h: "+str(h))
